@@ -3,10 +3,11 @@ package com.example.kidsdrowingapp
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 
-class DrowingView(context : Context, attrs : AttributeSet) : View(context, attrs) {
+class DrawingView(context : Context, attrs : AttributeSet) : View(context, attrs) {
         private var mpath : CustomPath? = null
         private var bitmap : Bitmap? = null
         private var mCanvasPaint : Paint? = null
@@ -15,9 +16,18 @@ class DrowingView(context : Context, attrs : AttributeSet) : View(context, attrs
     private var color = Color.BLACK
     private var canvas :  Canvas? = null
     private val mPathList = ArrayList<CustomPath>()
+    private val undoPath = ArrayList<CustomPath>()
 
     init{
             setUpDesign()
+    }
+
+    fun onUndoClick(){
+        if(mPathList.size > 0)
+        {
+            undoPath.add(mPathList.removeAt(mPathList.size-1))
+            invalidate()
+        }
     }
 
     private fun setUpDesign() {
@@ -28,7 +38,7 @@ class DrowingView(context : Context, attrs : AttributeSet) : View(context, attrs
         mDrowPaint!!.strokeJoin = Paint.Join.ROUND
         mDrowPaint!!.strokeCap = Paint.Cap.ROUND
         mCanvasPaint = Paint(Paint.DITHER_FLAG)
-        mBrushSize = 20.toFloat()
+        //mBrushSize = 20.toFloat() //default value
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -83,5 +93,13 @@ class DrowingView(context : Context, attrs : AttributeSet) : View(context, attrs
     internal inner class  CustomPath(var color : Int, var brushThickness : Float) : Path(){
 
     }
+    fun setBrushSize(brushSize : Float){
+        mBrushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, brushSize, resources.displayMetrics)
+        mDrowPaint!!.strokeWidth = mBrushSize
+    }
 
+    fun setColor(setSelectedolor: String){
+        color = Color.parseColor(setSelectedolor)
+        mDrowPaint!!.color = color
+    }
 }
